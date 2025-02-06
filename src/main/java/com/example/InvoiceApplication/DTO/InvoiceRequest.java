@@ -19,6 +19,17 @@ public class InvoiceRequest {
         private String companyName;
         private String approvedBy;
         private Long customerId;
+        private Long changeAmount;
+
+        public Long getChangeAmount() {
+            return changeAmount;
+        }
+
+        public void setChangeAmount(Long changeAmount) {
+            this.changeAmount = changeAmount;
+        }
+
+
 
         public Long getCustomerId() {
             return customerId;

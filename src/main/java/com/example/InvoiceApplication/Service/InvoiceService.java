@@ -118,6 +118,7 @@ public class InvoiceService {
         invoiceDTO.setQuantities(quantities);
         invoiceDTO.setTimestamp(bill.getTimestamp());
         invoiceDTO.setTotalAmount(totalAmount);
+        invoiceDTO.setChangeAmount(amountPaid-totalAmount);
         invoiceDTO.setCompanyName("CryptoWorld Exchanges");
         invoiceDTO.setApprovedBy("Himanshu");
 
