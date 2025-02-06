@@ -30,6 +30,30 @@ public class InvoiceService {
     @Autowired
     private BillRepository billRepository;
 
+    /*private Long sequence = 0L;
+    private LocalDate lastGeneratedDate = LocalDate.now();
+
+    // Method to generate the bill ID
+    private Long generateBillId() {
+        LocalDate today = LocalDate.now();
+
+        // Reset the sequence if the date has changed
+        if (!today.equals(lastGeneratedDate)) {
+            sequence = 0L; // Reset sequence
+            lastGeneratedDate = today; // Update last generated date
+        }
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        String datePart = today.format(formatter);
+
+        // Increment the sequence for each new bill
+        sequence++;
+
+        // Combine date and sequence to form the bill ID
+        return Long.parseLong(datePart + String.format("%03d", sequence)); //
+    }
+    * */
+
     // Fix the method to get items related to the bill
     private List<Item> getItemsForBill(Long billId) {
         return itemRepository.findItemsByBillId(billId); // Assumed repository method
@@ -40,23 +64,34 @@ public class InvoiceService {
         return quantityRepository.findQuantitiesByBillId(billId); // Assumed repository method
     }
 
+
+
     public InvoiceRequest.InvoiceDTO generateInvoice(Long customerId, Long billId, Long amountPaid) {
 
-        // Handle customerId case
+        // Step 1: Handle customerId case to find a matching bill
+        Bill bill = null;
+
         if (customerId != null) {
             List<Bill> bills = billRepository.findByCustomerId(customerId);
             if (!bills.isEmpty()) {
-              Bill  bill = bills.get(0); // Assuming first match
+                bill = bills.get(0); // Assuming first match
             }
         }
-
         // Step 1: Fetch the bill using the billId
 
-        Optional<Bill> billOptional = billRepository.findById(billId);
-        if (!billOptional.isPresent()) {
-            throw new RuntimeException("No invoice found for the given billId: " + billId);
+        // If no bill found with customerId, try using billId
+        if (bill == null && billId != null) {
+            Optional<Bill> billOptional = billRepository.findById(billId);
+            if (!billOptional.isPresent()) {
+                throw new RuntimeException("No invoice found for the given billId: " + billId);
+            }
+            bill = billOptional.get();
         }
-        Bill bill = billOptional.get();
+
+        // If still no bill found, throw an exception
+        if (bill == null) {
+            throw new RuntimeException("No invoice found for the given customerId or billId.");
+        }
 
         bill.setAmountPaid(amountPaid);
         Customer customer = customerRepository.findById(bill.getCustomerId()).orElseThrow(() -> new RuntimeException("Customer not found for the given customerId"));
@@ -73,9 +108,12 @@ public class InvoiceService {
 
         // Step 6: Create the InvoiceDTO and populate it
         InvoiceRequest.InvoiceDTO invoiceDTO = new InvoiceRequest.InvoiceDTO();
+        invoiceDTO.setAmountPaid(bill.getAmountPaid());
         invoiceDTO.setBillId(bill.getId());
         invoiceDTO.setCustomerName(customer.getCustomerName());
+        invoiceDTO.setCustomerPhone(customer.getCustomerPhone());
         invoiceDTO.setCustomerEmail(customer.getCustomerEmail());
+        invoiceDTO.setCustomerId(customer.getId());
         invoiceDTO.setItems(items);
         invoiceDTO.setQuantities(quantities);
         invoiceDTO.setTimestamp(bill.getTimestamp());
@@ -104,7 +142,7 @@ public class InvoiceService {
                 throw new RuntimeException("Requested quantity exceeds available stock for item: " + item.getItemName());
             }
 
-            long itemTotalPrice = item.getItemPrice() * quantity.getAvailableQuantity();
+            long itemTotalPrice = item.getItemPrice() * quantity.getRequestedQuantity();
 
             // Calculate CGST and SGST for intra-state (same state)
             if (!isInterstate) {  // Intra-state (CGST + SGST)
@@ -129,11 +167,16 @@ public class InvoiceService {
 
 
         // Update bill entity
+      //  bill.setAmountPaid(amountPaid);
         bill.setTotalCGST(totalCGST);
         bill.setTotalSGST(totalSGST);
         bill.setTotalIGST(totalIGST);
         bill.setTotalCess(totalCess);
+        bill.setTotalAmount(totalAmount);
+        billRepository.save(bill);
 
         return totalAmount;
     }
+
+
 }

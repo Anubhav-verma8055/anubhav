@@ -14,6 +14,7 @@ public class QuantityService {
     private QuantityRepository quantityRepository;
 
     // Create or update quantity
+
     public Quantity createOrUpdateQuantity(Long itemId, Quantity quantity) {
         Optional<Quantity> existingQuantity = quantityRepository.findById(itemId);
 

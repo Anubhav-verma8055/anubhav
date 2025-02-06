@@ -33,7 +33,7 @@ public class ItemController {
     public String getItemById(@PathVariable Long id) {
         Optional<Item> item = itemService.getItemById(id);
         if (item.isPresent()) {
-            return "Item found: " + item.get().getItemName(); // Return a basic string or item details
+            return "Item found: " + item.get().getItemDescription(); // Return a basic string or item details
         } else {
             return "Item not found with ID: " + id;  // Item not found
         }

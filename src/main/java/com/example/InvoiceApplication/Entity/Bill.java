@@ -17,6 +17,12 @@ public class Bill {
     private Long customerId;
     private LocalDateTime timestamp;
     private Long totalAmount;
+    private Boolean isInterState;
+    private Long totalCGST;
+    private Long totalSGST;         // Total SGST amount for the invoice
+    private Long totalIGST;         // Total IGST amount for the invoice
+    private Long totalCess;
+    private Long amountPaid;
 
     public Long getAmountPaid() {
         return amountPaid;
@@ -26,13 +32,6 @@ public class Bill {
         this.amountPaid = amountPaid;
     }
 
-    private Long amountPaid;
-
-    private Boolean isInterState;
-    private Long totalCGST;
-    private Long totalSGST;         // Total SGST amount for the invoice
-    private Long totalIGST;         // Total IGST amount for the invoice
-    private Long totalCess;
 
     public Boolean getIsInterState() {
         return isInterState;

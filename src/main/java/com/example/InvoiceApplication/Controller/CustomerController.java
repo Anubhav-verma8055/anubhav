@@ -1,6 +1,7 @@
 package com.example.InvoiceApplication.Controller;
 
 import com.example.InvoiceApplication.Entity.Customer;
+import com.example.InvoiceApplication.Repository.CustomerRepository;
 import com.example.InvoiceApplication.Service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,9 @@ import java.util.Optional;
 public class CustomerController {
     @Autowired
     private CustomerService customerService;
+
+    @Autowired
+    private CustomerRepository customerRepository;
 
     //create a new customer
     @PostMapping
@@ -64,5 +68,12 @@ public class CustomerController {
             throw new RuntimeException("Customer not found with ID: " + id);
         }
     }
+
+//    @GetMapping("/getPhone")
+//    public Long getCustomerIdByPhoneNumber(String phoneNumber) {
+//        Customer customer = customerRepository.findByPhone(phoneNumber)
+//                .orElseThrow(() -> new RuntimeException("Customer not found for phone number: " + phoneNumber));
+//        return customer.getId();
+//    }
 
 }

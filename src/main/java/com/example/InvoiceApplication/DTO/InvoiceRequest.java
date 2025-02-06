@@ -10,12 +10,43 @@ public class InvoiceRequest {
         private Long billId;
         private String customerName;
         private String customerEmail;
+        private String customerPhone;
         private List<Item> items;
         private List<Quantity> quantities;
         private LocalDateTime timestamp;
         private Long totalAmount;
+        private Long amountPaid;
         private String companyName;
         private String approvedBy;
+        private Long customerId;
+
+        public Long getCustomerId() {
+            return customerId;
+        }
+
+        public void setCustomerId(Long customerId) {
+            this.customerId = customerId;
+        }
+
+        public String getCustomerPhone() {
+            return customerPhone;
+        }
+
+        public void setCustomerPhone(String customerPhone) {
+            this.customerPhone = customerPhone;
+        }
+
+
+
+        public Long getAmountPaid() {
+            return amountPaid;
+        }
+
+        public void setAmountPaid(Long amountPaid) {
+            this.amountPaid = amountPaid;
+        }
+
+
         public String getCompanyName() {
             return companyName;
         }
