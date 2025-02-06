@@ -12,7 +12,6 @@ import com.example.InvoiceApplication.Repository.QuantityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,46 +40,38 @@ public class InvoiceService {
         return quantityRepository.findQuantitiesByBillId(billId); // Assumed repository method
     }
 
-    // Modify the method to handle all 3 cases (customerId, billId, timestamp)
-    public InvoiceRequest.InvoiceDTO generateInvoice(Long customerId, Long billId, LocalDate timestamp, Long amountPaid) {
-        Bill bill = null;
+    public InvoiceRequest.InvoiceDTO generateInvoice(Long customerId, Long billId, Long amountPaid) {
 
         // Handle customerId case
         if (customerId != null) {
             List<Bill> bills = billRepository.findByCustomerId(customerId);
             if (!bills.isEmpty()) {
-                bill = bills.get(0); // Assuming first match
-            }
-        }
-        // Handle billId case
-        else if (billId != null) {
-            Optional<Bill> billOptional = billRepository.findById(billId);
-            if (billOptional.isPresent()) {
-                bill = billOptional.get();
-            }
-        }
-        // Handle timestamp case
-        else if (timestamp != null) {
-            List<Bill> bills = billRepository.findByTimestamp(timestamp);
-            if (!bills.isEmpty()) {
-                bill = bills.get(0);
+              Bill  bill = bills.get(0); // Assuming first match
             }
         }
 
-        // If no bill found, throw error
-        if (bill == null) {
-            throw new RuntimeException("No invoice found for the given details.");
+        // Step 1: Fetch the bill using the billId
+
+        Optional<Bill> billOptional = billRepository.findById(billId);
+        if (!billOptional.isPresent()) {
+            throw new RuntimeException("No invoice found for the given billId: " + billId);
         }
+        Bill bill = billOptional.get();
 
-        // Load the customer and associated items/quantities
-        Customer customer = customerRepository.findById(bill.getCustomerId()).orElseThrow();
-        List<Item> items = getItemsForBill(bill.getId()); // Fetch items related to the bill
-        List<Quantity> quantities = getQuantitiesForBill(bill.getId()); // Fetch quantities related to the bill
+        bill.setAmountPaid(amountPaid);
+        Customer customer = customerRepository.findById(bill.getCustomerId()).orElseThrow(() -> new RuntimeException("Customer not found for the given customerId"));
 
-        // Calculate the total amount for the invoice
-        Long totalAmount = calculateTotalAmount(items, quantities, true); // Assuming interstate as true
+        // Step 4: Fetch the items and quantities related to this bill
+        List<Item> items = getItemsForBill(bill.getId());
+        List<Quantity> quantities = getQuantitiesForBill(bill.getId());
+        Boolean isInterState = bill.getIsInterState();  // Fetch the interstate flag from the bill
 
-        // Create and populate the InvoiceDTO
+       bill.setAmountPaid(amountPaid);
+       bill.setCustomerId(customer.getId());
+        // Step 5: Calculate the total amount for the invoice
+        Long totalAmount = calculateTotalAmount(items, quantities, isInterState, bill);
+
+        // Step 6: Create the InvoiceDTO and populate it
         InvoiceRequest.InvoiceDTO invoiceDTO = new InvoiceRequest.InvoiceDTO();
         invoiceDTO.setBillId(bill.getId());
         invoiceDTO.setCustomerName(customer.getCustomerName());
@@ -95,7 +86,8 @@ public class InvoiceService {
         return invoiceDTO;
     }
 
-    private Long calculateTotalAmount(List<Item> items, List<Quantity> quantities, boolean isInterstate) {
+
+    private Long calculateTotalAmount(List<Item> items, List<Quantity> quantities, boolean isInterstate,Bill bill) {
         long totalAmount = 0;
         long totalCGST = 0;
         long totalSGST = 0;
@@ -106,6 +98,11 @@ public class InvoiceService {
         for (int i = 0; i < items.size(); i++) {
             Item item = items.get(i);
             Quantity quantity = quantities.get(i);
+
+            // Ensure requested quantity does not exceed available stock
+            if (quantity.getRequestedQuantity() > quantity.getAvailableQuantity()) {
+                throw new RuntimeException("Requested quantity exceeds available stock for item: " + item.getItemName());
+            }
 
             long itemTotalPrice = item.getItemPrice() * quantity.getAvailableQuantity();
 
@@ -129,6 +126,13 @@ public class InvoiceService {
             totalCess += cessAmount;
             totalAmount += cessAmount;  // Add Cess to total amount
         }
+
+
+        // Update bill entity
+        bill.setTotalCGST(totalCGST);
+        bill.setTotalSGST(totalSGST);
+        bill.setTotalIGST(totalIGST);
+        bill.setTotalCess(totalCess);
 
         return totalAmount;
     }

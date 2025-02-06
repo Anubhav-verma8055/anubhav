@@ -6,7 +6,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 public class Bill {
@@ -19,10 +18,31 @@ public class Bill {
     private LocalDateTime timestamp;
     private Long totalAmount;
 
+    public Long getAmountPaid() {
+        return amountPaid;
+    }
+
+    public void setAmountPaid(Long amountPaid) {
+        this.amountPaid = amountPaid;
+    }
+
+    private Long amountPaid;
+
+    private Boolean isInterState;
     private Long totalCGST;
     private Long totalSGST;         // Total SGST amount for the invoice
     private Long totalIGST;         // Total IGST amount for the invoice
     private Long totalCess;
+
+    public Boolean getIsInterState() {
+        return isInterState;
+    }
+
+    public void setIsInterstate(Boolean interState) {
+        isInterState = interState;
+    }
+
+
 
     public Long getTotalCGST() {
         return totalCGST;
@@ -65,8 +85,6 @@ public class Bill {
     }
 
 
-//    private List<Item> listOFItems;
-//   private  List<Quantity> quantityOfItem;
 
     public Long getId() {
         return id;
@@ -91,22 +109,5 @@ public class Bill {
     public void setTimestamp(LocalDateTime timestamp) {
         this.timestamp = timestamp;
     }
-
-//    public List<Item> getListOFItems() {
-//        return listOFItems;
-//    }
-//
-//    public void setListOFItems(List<Item> listOFItems) {
-//        this.listOFItems = listOFItems;
-//    }
-//
-//    public List<Quantity> getQuantityOfItem() {
-//        return quantityOfItem;
-//    }
-//
-//    public void setQuantityOfItem(List<Quantity> quantityOfItem) {
-//        this.quantityOfItem = quantityOfItem;
-//    }
-
 
 }

@@ -3,38 +3,9 @@ package com.example.InvoiceApplication.DTO;
 import com.example.InvoiceApplication.Entity.Item;
 import com.example.InvoiceApplication.Entity.Quantity;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-
 public class InvoiceRequest {
-    private List<ItemRequest> items;
-    private List<Quantityrequest> quantities;
-    private boolean isInterstate;
-    public List<ItemRequest> getItems() {
-        return items;
-    }
-
-    public void setItems(List<ItemRequest> items) {
-        this.items = items;
-    }
-
-    public List<Quantityrequest> getQuantities() {
-        return quantities;
-    }
-
-    public void setQuantities(List<Quantityrequest> quantities) {
-        this.quantities = quantities;
-    }
-
-    public boolean isInterstate() {
-        return isInterstate;
-    }
-
-    public void setInterstate(boolean interstate) {
-        isInterstate = interstate;
-    }
-
     public static class InvoiceDTO {
         private Long billId;
         private String customerName;

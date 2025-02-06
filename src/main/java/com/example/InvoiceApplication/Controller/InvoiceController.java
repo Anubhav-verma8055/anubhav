@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDate;
+
 
 @RestController
 @RequestMapping("/invoice")
@@ -21,11 +21,11 @@ public class InvoiceController {
     public InvoiceRequest.InvoiceDTO generateInvoice(
             @RequestParam(required = false) Long customerId,
             @RequestParam(required = false) Long billId,
-            @RequestParam(required = false) LocalDate timestamp,
+
             @RequestParam Long amountPaid
     ) {
         try {
-            return invoiceService.generateInvoice(customerId, billId, timestamp, amountPaid);
+            return invoiceService.generateInvoice(customerId, billId, amountPaid);
 
         } catch (Exception e) {
             throw new RuntimeException("the invoice record is not found for given details");

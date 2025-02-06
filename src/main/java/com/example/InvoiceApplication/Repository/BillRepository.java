@@ -10,5 +10,10 @@ import java.util.Optional;
 public interface BillRepository extends JpaRepository<Bill, Long> {
     List<Bill> findByCustomerId(Long customerId);
     List<Bill> findByTimestamp(LocalDate timestamp);
-    Optional<Bill> findById(Long billId);
+   // Optional<Bill> findById(Long  billId);
+
+    Boolean findIsInterStateById(Long Id);
+
+    Optional<Bill> findById(Long id);
 }
+

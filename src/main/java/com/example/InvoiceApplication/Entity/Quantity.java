@@ -11,6 +11,18 @@ public class Quantity {
     private Long itemId;
     private String itemName;
     private Long availableQuantity;
+    private Long requestedQuantity;
+    private Long billId;
+
+    public Long getRequestedQuantity() {
+        return requestedQuantity;
+    }
+
+    public void setRequestedQuantity(Long requestedQuantity) {
+        this.requestedQuantity = requestedQuantity;
+    }
+
+
 
     public Long getBillId() {
         return billId;
@@ -20,7 +32,7 @@ public class Quantity {
         this.billId = billId;
     }
 
-    private Long billId;
+
 
     public Long getId() {
         return id;
